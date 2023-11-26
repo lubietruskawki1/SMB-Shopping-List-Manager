@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ShoppingListManager</string>
+    <string name="title_activity_product_list">ProductListActivity</string>
+    <string name="title_activity_options">OptionsActivity</string>
+</resources>
