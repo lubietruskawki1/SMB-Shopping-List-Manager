@@ -1,5 +1,6 @@
 package com.example.shoppinglistmanager.ui.productlist
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,14 @@ fun ProductItemCard(
         mutableStateOf(false)
     }
     val productStates: ProductStates = createProductStates(product)
+
+    // Checking if user clicked the notification about the addition of this
+    // product to the shopping list
+    val intent = (context as Activity).intent
+    val editProductId = intent.getLongExtra("editProductId", -1)
+    if (product.id == editProductId) {
+        editProductEnabledState.value = true
+    }
 
     Card(
         modifier = Modifier

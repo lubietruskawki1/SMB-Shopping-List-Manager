@@ -17,10 +17,17 @@ class ProductRepository(
 
     val allProducts: Flow<List<Product>> = productDao.getProducts()
 
-    suspend fun insert(product: Product) {
-        withContext(Dispatchers.IO) {
+    suspend fun insert(product: Product): Long? {
+        return withContext(Dispatchers.IO) {
             val values = createContentValuesFromProduct(product)
-            contentResolver.insert(ProductContentProvider.PRODUCTS_URI, values)
+            val uri = contentResolver
+                .insert(ProductContentProvider.PRODUCTS_URI, values)
+            if (uri != null) {
+                val productId: Long = ContentUris.parseId(uri)
+                productId
+            } else {
+                null
+            }
         }
     }
 

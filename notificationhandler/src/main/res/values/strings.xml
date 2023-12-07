@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NotificationHandler</string>
+    <string name="new_product_channel">newProductChannel</string>
+</resources>

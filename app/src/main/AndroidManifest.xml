@@ -19,7 +19,7 @@
             android:theme="@style/Theme.ShoppingListManager" />
         <activity
             android:name=".ui.productlist.ProductListActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_product_list"
             android:theme="@style/Theme.ShoppingListManager" />
         <activity

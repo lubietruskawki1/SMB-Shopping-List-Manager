@@ -1,6 +1,8 @@
 package com.example.shoppinglistmanager.ui.viewmodel
 
 import android.app.Application
+import android.content.Intent
+import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglistmanager.data.entity.Product
@@ -10,13 +12,16 @@ import com.example.shoppinglistmanager.data.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class ProductViewModel(application: Application) : AndroidViewModel(application) {
+class ProductViewModel(
+    private val application: Application
+) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
     var products: Flow<List<Product>>
 
     init {
-        val productDao: ProductDao = ProductDatabase.getDatabase(application).ProductDao()
+        val productDao: ProductDao =
+            ProductDatabase.getDatabase(application).ProductDao()
         val contentResolver = application.contentResolver
         productRepository = ProductRepository(productDao, contentResolver)
         products = productRepository.allProducts
@@ -24,7 +29,21 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
     fun insertProduct(product: Product) {
         viewModelScope.launch {
-            productRepository.insert(product)
+            val productId: Long? = productRepository.insert(product)
+            if (productId != null) {
+                val broadcastIntent =
+                    Intent("com.example.NEW_PRODUCT_ADDED")
+
+                val extras = Bundle().apply {
+                    putLong("productId", productId)
+                    putString("productName", product.name)
+                    putString("productPrice", product.price.toString())
+                    putInt("productQuantity", product.quantity)
+                }
+                broadcastIntent.putExtras(extras)
+
+                application.applicationContext.sendBroadcast(broadcastIntent)
+            }
         }
     }
 

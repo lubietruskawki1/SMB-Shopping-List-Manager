@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ShoppingListManager"
 include(":app")
- 
+include(":notificationhandler")
