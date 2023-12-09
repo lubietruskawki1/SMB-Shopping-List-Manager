@@ -7,16 +7,19 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.UriMatcher
 import android.database.Cursor
+import android.database.MatrixCursor
 import android.net.Uri
 import com.example.shoppinglistmanager.data.entity.Product
-import com.example.shoppinglistmanager.data.local.ProductDao
-import com.example.shoppinglistmanager.data.local.ProductDatabase
-import java.math.BigDecimal
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.FirebaseDatabase
+
+private const val DUMMY_ID = "DUMMY_ID"
 
 @SuppressLint("ProviderReadPermissionOnly")
 class ProductContentProvider : ContentProvider() {
 
-    private lateinit var productDao: ProductDao
+    private lateinit var firebaseDatabase: FirebaseDatabase
+    private val path: String = "products"
 
     companion object {
         private const val AUTHORITY = "com.example.shoppinglistmanager"
@@ -36,8 +39,7 @@ class ProductContentProvider : ContentProvider() {
     }
 
     override fun onCreate(): Boolean {
-        val context = context ?: return false
-        productDao = ProductDatabase.getDatabase(context).ProductDao()
+        firebaseDatabase = FirebaseDatabase.getInstance()
         return true
     }
 
@@ -46,17 +48,44 @@ class ProductContentProvider : ContentProvider() {
         selectionArgs: Array<String>?, sortOrder: String?
     ): Cursor? {
         val context = context ?: return null
-        val cursor: Cursor = when (uriMatcher.match(uri)) {
+        val cursor = MatrixCursor(arrayOf(
+            "id", "name", "price", "quantity", "purchased"
+        ))
+        when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCTS -> {
-                productDao.getProductsCursor()
+                firebaseDatabase.getReference(path)
+                    .get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val dataSnapshot: DataSnapshot = task.result
+                            for (snapshot in dataSnapshot.children) {
+                                addProductRow(cursor, dataSnapshot)
+                            }
+                        }
+                }
             }
             URI_CODE_PRODUCT -> {
-                productDao.getProductCursorById(ContentUris.parseId(uri))
+                val productId: Long = ContentUris.parseId(uri)
+                firebaseDatabase.getReference(path).child(productId.toString())
+                    .get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val dataSnapshot: DataSnapshot = task.result
+                            addProductRow(cursor, dataSnapshot)
+                        }
+                    }
             }
             else -> return null
         }
         cursor.setNotificationUri(context.contentResolver, uri)
         return cursor
+    }
+
+    private fun addProductRow(cursor: MatrixCursor, snapshot: DataSnapshot) {
+        val product: Product? = snapshot.getValue(Product::class.java)
+        product?.let {
+            cursor.addRow(arrayOf(
+                it.id, it.name, it.price, it.quantity, it.purchased
+            ))
+        }
     }
 
     override fun getType(uri: Uri): String? {
@@ -72,9 +101,11 @@ class ProductContentProvider : ContentProvider() {
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCTS -> {
                 val product: Product = createProductFromContentValues(values!!)
-                val id: Long = productDao.insertProduct(product)
-                if (id >= 0) {
-                    val finalUri = ContentUris.withAppendedId(uri, id)
+                val id: String? = firebaseDatabase.getReference(path).push().key
+                if (id != null) {
+                    product.id = id
+                    firebaseDatabase.getReference(path).child(id).setValue(product)
+                    val finalUri = Uri.withAppendedPath(uri, id)
                     context.contentResolver.notifyChange(finalUri, null)
                     finalUri
                 } else {
@@ -93,10 +124,11 @@ class ProductContentProvider : ContentProvider() {
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCT -> {
                 val product: Product = createProductFromContentValues(values!!)
-                product.id = ContentUris.parseId(uri)
-                val count: Int = productDao.updateProduct(product)
+                val id: String = uri.lastPathSegment ?: return 0
+                product.id = id
+                firebaseDatabase.getReference(path).child(id).setValue(product)
                 context.contentResolver.notifyChange(uri, null)
-                return count
+                1
             }
             else -> 0
         }
@@ -109,10 +141,10 @@ class ProductContentProvider : ContentProvider() {
         val context: Context = context ?: return 0
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCT -> {
-                val id: Long = ContentUris.parseId(uri)
-                val count: Int = productDao.deleteProductById(id)
+                val id: String = uri.lastPathSegment ?: return 0
+                firebaseDatabase.getReference(path).child(id).removeValue()
                 context.contentResolver.notifyChange(uri, null)
-                count
+                1
             }
             else -> 0
         }
@@ -120,8 +152,9 @@ class ProductContentProvider : ContentProvider() {
 
     private fun createProductFromContentValues(values: ContentValues): Product {
         return Product(
+            id = DUMMY_ID,
             name = values.getAsString("name"),
-            price = BigDecimal(values.getAsString("price")),
+            price = values.getAsString("price"),
             quantity = values.getAsInteger("quantity"),
             purchased = values.getAsBoolean("purchased")
         )

@@ -14,6 +14,10 @@ import com.example.notificationhandler.ui.showNotificationPermissionNotGrantedTo
 
 class NewProductNotificationService : Service() {
 
+    companion object {
+        private var index: Int = 0
+    }
+
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -30,7 +34,7 @@ class NewProductNotificationService : Service() {
             return
         }
 
-        val productId = intent.getLongExtra("productId", -1)
+        val productId = intent.getStringExtra("productId")
         val productName = intent.getStringExtra("productName")
         val productPrice = intent.getStringExtra("productPrice")
         val productQuantity = intent.getIntExtra("productQuantity", -1)
@@ -47,8 +51,8 @@ class NewProductNotificationService : Service() {
 
         val pendingIntent = PendingIntent.getActivity(
             this,
-            productId.toInt(), // Non-constant so that clicking the notification
-                               // opens the edit panel of a correct product
+            index, // Non-constant so that clicking the notification
+                   // opens the edit panel of a correct product
             activityIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -70,7 +74,7 @@ class NewProductNotificationService : Service() {
             showNotificationPermissionNotGrantedToast(this)
         } else {
             NotificationManagerCompat.from(this)
-                .notify(productId.toInt(), notification)
+                .notify(index++, notification)
         }
     }
 }

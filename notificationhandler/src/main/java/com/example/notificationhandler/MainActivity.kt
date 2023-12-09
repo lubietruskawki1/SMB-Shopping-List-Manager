@@ -29,10 +29,11 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.notificationhandler.ui.checkNotificationPermission
 import com.example.notificationhandler.ui.theme.ShoppingListManagerNotificationHandlerTheme
 
+private const val POST_NOTIFICATIONS_REQUEST_CODE = 101
+
 class MainActivity : ComponentActivity() {
 
     private lateinit var receiver: NewProductReceiver
-    private val postNotificationsRequestCode = 101
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                postNotificationsRequestCode
+                POST_NOTIFICATIONS_REQUEST_CODE
             )
         }
     }

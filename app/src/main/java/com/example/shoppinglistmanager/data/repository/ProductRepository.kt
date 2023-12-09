@@ -1,63 +1,85 @@
 package com.example.shoppinglistmanager.data.repository
 
-import android.content.ContentResolver
-import android.content.ContentUris
-import android.content.ContentValues
-import com.example.shoppinglistmanager.contentprovider.ProductContentProvider
+import android.util.Log
 import com.example.shoppinglistmanager.data.entity.Product
-import com.example.shoppinglistmanager.data.local.ProductDao
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class ProductRepository(
-    productDao: ProductDao,
-    private val contentResolver: ContentResolver
+    private val firebaseDatabase: FirebaseDatabase
 ) {
 
-    val allProducts: Flow<List<Product>> = productDao.getProducts()
+    val allProductsMutable = MutableStateFlow(HashMap<String, Product>())
+    private val path: String = "products"
 
-    suspend fun insert(product: Product): Long? {
-        return withContext(Dispatchers.IO) {
-            val values = createContentValuesFromProduct(product)
-            val uri = contentResolver
-                .insert(ProductContentProvider.PRODUCTS_URI, values)
-            if (uri != null) {
-                val productId: Long = ContentUris.parseId(uri)
-                productId
-            } else {
-                null
+    init {
+        firebaseDatabase.getReference(path).addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val product: Product = createProductFromSnapshot(snapshot)
+                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
+                    put(product.id, product)
+                } as HashMap<String, Product>
             }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val product: Product = createProductFromSnapshot(snapshot)
+                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
+                    put(product.id, product)
+                } as HashMap<String, Product>
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val product: Product = createProductFromSnapshot(snapshot)
+                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
+                    remove(product.id, product)
+                } as HashMap<String, Product>
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                val product: Product = createProductFromSnapshot(snapshot)
+                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
+                    remove(product.id, product)
+                    put(product.id, product)
+                } as HashMap<String, Product>
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ProductRepository", "Database operation cancelled: ${error.message}")
+            }
+        })
+    }
+
+    private fun createProductFromSnapshot(snapshot: DataSnapshot): Product {
+        return Product(
+            id = snapshot.ref.key as String,
+            name = snapshot.child("name").value as String,
+            price = snapshot.child("price").value as String,
+            quantity = (snapshot.child("quantity").value as Long).toInt(),
+            purchased = snapshot.child("purchased").value as Boolean
+        )
+    }
+
+    fun insert(product: Product): String {
+        firebaseDatabase.getReference(path).push().also {
+            product.id = it.ref.key!!
+            it.setValue(product)
+            return product.id
         }
     }
 
-    suspend fun update(product: Product) {
-        withContext(Dispatchers.IO) {
-            val values = createContentValuesFromProduct(product)
-            val uri = ContentUris.withAppendedId(
-                ProductContentProvider.PRODUCTS_URI,
-                product.id
-            )
-            contentResolver.update(uri, values, null, null)
-        }
+    fun update(product: Product) {
+        val ref = firebaseDatabase.getReference("$path/${product.id}")
+        ref.child("name").setValue(product.name)
+        ref.child("price").setValue(product.price)
+        ref.child("quantity").setValue(product.quantity)
+        ref.child("purchased").setValue(product.purchased)
     }
 
-    suspend fun delete(product: Product) {
-        withContext(Dispatchers.IO) {
-            val uri = ContentUris.withAppendedId(
-                ProductContentProvider.PRODUCTS_URI,
-                product.id
-            )
-            contentResolver.delete(uri, null, null)
-        }
+    fun delete(product: Product) {
+        firebaseDatabase.getReference("$path/${product.id}").removeValue()
     }
 
-    private fun createContentValuesFromProduct(product: Product): ContentValues {
-        return ContentValues().apply {
-            put("name", product.name)
-            put("price", product.price.toString())
-            put("quantity", product.quantity)
-            put("purchased", product.purchased)
-        }
-    }
 }

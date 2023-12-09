@@ -5,12 +5,15 @@ import android.widget.Toast
 import com.example.shoppinglistmanager.data.entity.Product
 import java.math.BigDecimal
 
+private const val DUMMY_ID = "DUMMY_ID"
+
 class ProductManager(
     var name: String,
     private var price: String,
     private var quantity: String,
     private var purchased: Boolean
 ) {
+
     constructor(productStates: ProductStates) : this(
         name = productStates.name.value,
         price = productStates.price.value,
@@ -106,8 +109,9 @@ class ProductManager(
 
     fun createProduct(): Product {
         return Product(
+            id = DUMMY_ID,
             name = name.trim(),
-            price = price.toBigDecimal(),
+            price = formattedPrice(),
             quantity = quantity.toInt(),
             purchased = purchased
         )
@@ -115,8 +119,14 @@ class ProductManager(
 
     fun updateProduct(product: Product) {
         product.name = name.trim()
-        product.price = price.toBigDecimal()
+        product.price = formattedPrice()
         product.quantity = quantity.toInt()
         product.purchased = purchased
     }
+
+    private fun formattedPrice(): String {
+        // Format the price to have exactly two decimal places
+        return String.format("%.2f", price.toDouble())
+    }
+
 }

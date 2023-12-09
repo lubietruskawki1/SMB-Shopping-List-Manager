@@ -71,8 +71,8 @@ private fun ProductList(
     productViewModel: ProductViewModel,
     innerPadding: PaddingValues
 ) {
-    val products: List<Product> by productViewModel.products
-        .collectAsState(initial = emptyList())
+    val products: Map<String, Product> by productViewModel.products
+        .collectAsState(initial = emptyMap())
 
     LazyColumn(
         modifier = Modifier
@@ -80,7 +80,7 @@ private fun ProductList(
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        items(products) { product ->
+        items(products.values.toList()) { product ->
             ProductItemCard(productViewModel, product)
         }
         // Adding a spacer, so that the AddProductButton doesn't cover the

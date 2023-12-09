@@ -57,7 +57,7 @@ fun ProductItemCard(
     // Checking if user clicked the notification about the addition of this
     // product to the shopping list
     val intent = (context as Activity).intent
-    val editProductId = intent.getLongExtra("editProductId", -1)
+    val editProductId = intent.getStringExtra("editProductId")
     if (product.id == editProductId) {
         editProductEnabledState.value = true
     }
@@ -103,7 +103,7 @@ fun ProductItemCard(
                         fontWeight = FontWeight.Bold,
                     )
                     val totalPrice: BigDecimal =
-                        product.price * BigDecimal(product.quantity)
+                        BigDecimal(product.price) * BigDecimal(product.quantity)
                     Text(
                         text = "Total price: $${totalPrice}",
                         fontSize = priceAndQuantityFontSize

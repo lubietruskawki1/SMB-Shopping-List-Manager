@@ -34,12 +34,12 @@
             </intent-filter>
         </activity>
 
-        <provider
-            android:authorities="com.example.shoppinglistmanager"
-            android:name=".contentprovider.ProductContentProvider"
-            android:enabled="true"
-            android:exported="true"
-            android:readPermission="com.example.shoppinglistmanager.READ_DATABASE" />
+<!--        <provider-->
+<!--            android:authorities="com.example.shoppinglistmanager"-->
+<!--            android:name=".contentprovider.ProductContentProvider"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true"-->
+<!--            android:readPermission="com.example.shoppinglistmanager.READ_DATABASE" />-->
     </application>
 
 </manifest>
