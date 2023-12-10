@@ -1,7 +1,6 @@
 package com.example.shoppinglistmanager.ui.utils
 
 import android.content.Context
-import android.widget.Toast
 import com.example.shoppinglistmanager.data.entity.Product
 import java.math.BigDecimal
 
@@ -35,10 +34,6 @@ class ProductManager(
             return parts[1].length <= 2
         }
         return true
-    }
-
-    private fun showToast(context: Context, message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun isValidName(context: Context): Boolean {

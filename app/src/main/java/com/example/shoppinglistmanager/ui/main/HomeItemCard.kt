@@ -39,7 +39,9 @@ fun MenuItemCard(homeItem: HomeItem) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp, 32.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 32.dp)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

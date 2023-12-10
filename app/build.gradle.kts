@@ -57,6 +57,9 @@ kotlin {
 
 dependencies {
     implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("com.google.firebase:firebase-auth:22.3.0")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     val room_version = "2.5.2"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -68,6 +71,7 @@ dependencies {
     implementation("androidx.datastore:datastore:1.0.0")
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha08")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")

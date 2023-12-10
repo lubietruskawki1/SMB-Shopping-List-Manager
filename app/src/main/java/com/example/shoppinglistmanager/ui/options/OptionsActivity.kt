@@ -58,7 +58,7 @@ class OptionsActivity : ComponentActivity() {
 }
 
 @Composable
-fun OptionsScreen(optionsViewModel: OptionsViewModel) {
+private fun OptionsScreen(optionsViewModel: OptionsViewModel) {
     Scaffold(
         topBar = { TopAppBar("Options") }
     ) { innerPadding ->

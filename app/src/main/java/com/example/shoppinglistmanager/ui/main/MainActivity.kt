@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen() {
+private fun HomeScreen() {
     val items = listOf(
         HomeItem(
             name = "Shopping List",

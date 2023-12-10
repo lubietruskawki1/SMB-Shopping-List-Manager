@@ -92,10 +92,10 @@ fun AddProductDialog(
 private fun NameTextField(nameState: MutableState<String>) {
     TextField(
         value = nameState.value,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         onValueChange = {
             nameState.value = it
         },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         placeholder = {
             Text(
                 text = "Name",
@@ -112,10 +112,10 @@ private fun NumberTextField(
 ) {
     TextField(
         value = state.value,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = {
             state.value = it
         },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         placeholder = {
             Text(
                 text = placeholderText,
