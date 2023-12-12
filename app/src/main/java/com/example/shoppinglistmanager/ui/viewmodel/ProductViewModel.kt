@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglistmanager.data.entity.Product
 import com.example.shoppinglistmanager.data.repository.ProductRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,11 +19,13 @@ class ProductViewModel(
 
     private val productRepository: ProductRepository
     private var firebaseDatabase: FirebaseDatabase
+    private var firebaseUser: FirebaseUser
     val products: StateFlow<HashMap<String, Product>>
 
     init {
         firebaseDatabase = FirebaseDatabase.getInstance()
-        productRepository = ProductRepository(firebaseDatabase)
+        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+        productRepository = ProductRepository(firebaseDatabase, firebaseUser)
         products = productRepository.allProductsMutable
     }
 

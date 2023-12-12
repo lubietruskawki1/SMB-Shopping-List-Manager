@@ -10,6 +10,8 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
 import com.example.shoppinglistmanager.data.entity.Product
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 
@@ -19,7 +21,8 @@ private const val DUMMY_ID = "DUMMY_ID"
 class ProductContentProvider : ContentProvider() {
 
     private lateinit var firebaseDatabase: FirebaseDatabase
-    private val path: String = "products"
+    private lateinit var firebaseUser: FirebaseUser
+    private lateinit var path: String
 
     companion object {
         private const val AUTHORITY = "com.example.shoppinglistmanager"
@@ -40,6 +43,8 @@ class ProductContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
         firebaseDatabase = FirebaseDatabase.getInstance()
+        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+        path = "users/${firebaseUser.uid}/products"
         return true
     }
 

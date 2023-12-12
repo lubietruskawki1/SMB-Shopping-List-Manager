@@ -96,7 +96,7 @@ private fun NameTextField(nameState: MutableState<String>) {
             nameState.value = it
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        placeholder = {
+        label = {
             Text(
                 text = "Name",
                 color = Color.Gray
@@ -108,7 +108,7 @@ private fun NameTextField(nameState: MutableState<String>) {
 @Composable
 private fun NumberTextField(
     state: MutableState<String>,
-    placeholderText: String
+    labelText: String
 ) {
     TextField(
         value = state.value,
@@ -116,9 +116,9 @@ private fun NumberTextField(
             state.value = it
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        placeholder = {
+        label = {
             Text(
-                text = placeholderText,
+                text = labelText,
                 color = Color.Gray
             )
         }

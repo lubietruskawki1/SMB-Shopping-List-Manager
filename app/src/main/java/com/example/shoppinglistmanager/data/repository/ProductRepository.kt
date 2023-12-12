@@ -2,6 +2,7 @@ package com.example.shoppinglistmanager.data.repository
 
 import android.util.Log
 import com.example.shoppinglistmanager.data.entity.Product
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -9,11 +10,12 @@ import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ProductRepository(
-    private val firebaseDatabase: FirebaseDatabase
+    private val firebaseDatabase: FirebaseDatabase,
+    firebaseUser: FirebaseUser
 ) {
 
     val allProductsMutable = MutableStateFlow(HashMap<String, Product>())
-    private val path: String = "products"
+    private val path: String = "users/${firebaseUser.uid}/products"
 
     init {
         firebaseDatabase.getReference(path).addChildEventListener(object : ChildEventListener {
