@@ -13,6 +13,11 @@
         android:theme="@style/Theme.ShoppingListManager"
         tools:targetApi="31">
         <activity
+            android:name=".ui.authentication.RegistrationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_register"
+            android:theme="@style/Theme.ShoppingListManager" />
+        <activity
             android:name=".ui.authentication.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"

@@ -65,9 +65,6 @@ fun TopAppBar(title: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarAuthentication(title: String) {
-    val context: Context = LocalContext.current
-    val activity: Activity = context as Activity
-
     TopAppBar(
         title = {
             Text(
@@ -77,16 +74,7 @@ fun TopAppBarAuthentication(title: String) {
                     .wrapContentSize(Alignment.Center)
             )
         },
-        colors = topAppBarColors(),
-        navigationIcon = {
-            if (title != "Login") {
-                IconButton(onClick = {
-                    activity.finish()
-                }) {
-                    Icon(Icons.Default.ArrowBack, "Return")
-                }
-            }
-        }
+        colors = topAppBarColors()
     )
 }
 

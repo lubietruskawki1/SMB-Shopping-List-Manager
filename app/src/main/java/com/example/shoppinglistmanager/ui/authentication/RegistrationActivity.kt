@@ -1,11 +1,11 @@
 package com.example.shoppinglistmanager.ui.authentication
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -27,19 +30,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shoppinglistmanager.R
 import com.example.shoppinglistmanager.ui.common.TopAppBarAuthentication
 import com.example.shoppinglistmanager.ui.main.MainActivity
 import com.example.shoppinglistmanager.ui.theme.ShoppingListManagerTheme
 import com.example.shoppinglistmanager.ui.viewmodel.AuthenticationViewModel
 import com.example.shoppinglistmanager.ui.viewmodel.OptionsViewModel
 
-class LoginActivity : ComponentActivity() {
+class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -50,7 +51,7 @@ class LoginActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginScreen(authenticationViewModel)
+                    RegistrationScreen(authenticationViewModel)
                 }
             }
         }
@@ -58,72 +59,56 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
-private fun LoginScreen(authenticationViewModel: AuthenticationViewModel) {
+private fun RegistrationScreen(authenticationViewModel: AuthenticationViewModel) {
     val context: Context = LocalContext.current
+    val activity: Activity = context as Activity
 
     Scaffold(
-        topBar = { TopAppBarAuthentication("Login") }
+        topBar = { TopAppBarAuthentication("Registration") }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
         ) {
+            Row(
+                modifier = Modifier
+                    .padding(start = 24.dp, end = 24.dp, top = 24.dp)
+                    .clickable {
+                        activity.finish()
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.ArrowBack,
+                    contentDescription = "Return",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Back to Login",
+                    style = TextStyle(fontSize = 18.sp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             ElevatedCard(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(start = 24.dp, end = 24.dp, bottom = 32.dp)
+                        .padding(start = 24.dp, end = 24.dp,
+                                 top = 24.dp, bottom = 32.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp, vertical = 32.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Shopping List Manager",
-                            style = TextStyle(fontSize = 24.sp)
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.shopping_list),
-                            contentDescription = "Shopping List",
-                            modifier = Modifier.size(128.dp)
-                        )
-                    }
-                    LoginInputs(authenticationViewModel)
+                    RegistrationInputs(authenticationViewModel)
                 }
-            }
-
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Don't have an account?",
-                    style = TextStyle(fontSize = 18.sp)
-                )
-                Text(
-                    text = "Register",
-                    modifier = Modifier
-                        .clickable {
-                            context.startActivity(
-                                Intent(context, RegistrationActivity::class.java)
-                            )
-                        },
-                    style = TextStyle(fontSize = 18.sp),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
             }
         }
     }
 }
 
 @Composable
-fun LoginInputs(authenticationViewModel: AuthenticationViewModel) {
+fun RegistrationInputs(authenticationViewModel: AuthenticationViewModel) {
     val context: Context = LocalContext.current
 
     val emailState: MutableState<String> = remember {
@@ -132,12 +117,15 @@ fun LoginInputs(authenticationViewModel: AuthenticationViewModel) {
     val passwordState: MutableState<String> = remember {
         mutableStateOf("")
     }
+    val confirmPasswordState: MutableState<String> = remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Login",
+            text = "Registration",
             style = TextStyle(fontSize = 32.sp)
         )
 
@@ -145,15 +133,21 @@ fun LoginInputs(authenticationViewModel: AuthenticationViewModel) {
         PasswordTextField(
             passwordState = passwordState,
             labelText = "Password",
+            imeAction = ImeAction.Next
+        )
+        PasswordTextField(
+            passwordState = confirmPasswordState,
+            labelText = "Confirm password",
             imeAction = ImeAction.Done
         )
 
         Button(
             modifier = Modifier.padding(top = 24.dp),
             onClick = {
-                authenticationViewModel.login(
+                authenticationViewModel.register(
                     email = emailState.value,
                     password = passwordState.value,
+                    confirmPassword = confirmPasswordState.value,
                     onSuccess = {
                         context.startActivity(
                             Intent(context, MainActivity::class.java)
@@ -163,7 +157,7 @@ fun LoginInputs(authenticationViewModel: AuthenticationViewModel) {
                 )
             }
         ) {
-            Text("Login")
+            Text("Register")
         }
     }
 }
