@@ -21,28 +21,40 @@ class ProductViewModel(
     private var firebaseDatabase: FirebaseDatabase
     private var firebaseUser: FirebaseUser
     val products: StateFlow<HashMap<String, Product>>
+    val sharedProducts: StateFlow<HashMap<String, Product>>
 
     init {
         firebaseDatabase = FirebaseDatabase.getInstance()
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
         productRepository = ProductRepository(firebaseDatabase, firebaseUser)
         products = productRepository.allProductsMutable
+        sharedProducts = productRepository.allSharedProductsMutable
     }
 
     fun insertProduct(product: Product) {
         viewModelScope.launch {
             val productId: String = productRepository.insert(product)
-
-            val broadcastIntent = Intent("com.example.NEW_PRODUCT_ADDED")
-            val extras = Bundle().apply {
-                putString("productId", productId)
-                putString("productName", product.name)
-                putString("productPrice", product.price)
-                putInt("productQuantity", product.quantity)
-            }
-            broadcastIntent.putExtras(extras)
-            application.applicationContext.sendBroadcast(broadcastIntent)
+            sendBroadcast(productId, product)
         }
+    }
+
+    fun insertSharedProduct(product: Product) {
+        viewModelScope.launch {
+            val productId: String = productRepository.insertShared(product)
+            sendBroadcast(productId, product)
+        }
+    }
+
+    private fun sendBroadcast(productId: String, product: Product) {
+        val broadcastIntent = Intent("com.example.NEW_PRODUCT_ADDED")
+        val extras = Bundle().apply {
+            putString("productId", productId)
+            putString("productName", product.name)
+            putString("productPrice", product.price)
+            putInt("productQuantity", product.quantity)
+        }
+        broadcastIntent.putExtras(extras)
+        application.applicationContext.sendBroadcast(broadcastIntent)
     }
 
     fun updateProduct(product: Product) {
@@ -51,9 +63,21 @@ class ProductViewModel(
         }
     }
 
+    fun updateSharedProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.updateShared(product)
+        }
+    }
+
     fun deleteProduct(product: Product) {
         viewModelScope.launch {
             productRepository.delete(product)
+        }
+    }
+
+    fun deleteSharedProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.deleteShared(product)
         }
     }
 

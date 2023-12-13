@@ -24,7 +24,9 @@ private val darkColorScheme: ColorScheme = darkColorScheme(
     surface = DarkPurple10,
     onSurface = Purple10,
     surfaceVariant = DarkPurple30,
-    onSurfaceVariant = Purple10
+    onSurfaceVariant = Purple10,
+    secondaryContainer = DarkPurple20,
+    onSecondaryContainer = Purple10
 )
 
 private val lightColorScheme: ColorScheme = lightColorScheme(
@@ -37,7 +39,9 @@ private val lightColorScheme: ColorScheme = lightColorScheme(
     surface = Purple10,
     onSurface = Purple80,
     surfaceVariant = Purple30,
-    onSurfaceVariant = Purple80
+    onSurfaceVariant = Purple80,
+    secondaryContainer = Purple20,
+    onSecondaryContainer = Purple80
 )
 
 class FontSizePreferences(

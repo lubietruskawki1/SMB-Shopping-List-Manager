@@ -2,6 +2,7 @@ package com.example.shoppinglistmanager.ui.productlist
 
 import android.app.Activity
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,7 +47,8 @@ import java.math.BigDecimal
 @Composable
 fun ProductItemCard(
     productViewModel: ProductViewModel,
-    product: Product
+    product: Product,
+    isShared: Boolean
 ) {
     val context: Context = LocalContext.current
     val editProductEnabledState: MutableState<Boolean> = remember {
@@ -66,7 +68,19 @@ fun ProductItemCard(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        border = when {
+            isShared -> BorderStroke (1.dp, MaterialTheme.colorScheme.onSurface)
+            else -> null
+        },
+        colors = when {
+            !isShared -> CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+            else -> CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        }
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -83,7 +97,11 @@ fun ProductItemCard(
                     productPurchasedValue = it
 
                     product.purchased = it
-                    productViewModel.updateProduct(product)
+                    if (!isShared) {
+                        productViewModel.updateProduct(product)
+                    } else {
+                        productViewModel.updateSharedProduct(product)
+                    }
                 },
                 modifier = Modifier.padding(2.dp),
                 colors = CheckboxDefaults.colors(iconColor)
@@ -136,7 +154,12 @@ fun ProductItemCard(
 
                         if (productManager.isValidProduct(context)) {
                             productManager.updateProduct(product)
-                            productViewModel.updateProduct(product)
+
+                            if (!isShared) {
+                                productViewModel.updateProduct(product)
+                            } else {
+                                productViewModel.updateSharedProduct(product)
+                            }
 
                             productStates.reset(product)
 
@@ -153,7 +176,11 @@ fun ProductItemCard(
                     )
                 }
                 IconButton(onClick = {
-                    productViewModel.deleteProduct(product)
+                    if (!isShared) {
+                        productViewModel.deleteProduct(product)
+                    } else {
+                        productViewModel.deleteSharedProduct(product)
+                    }
                 }) {
                     Icon(
                         imageVector = Icons.Default.Delete,

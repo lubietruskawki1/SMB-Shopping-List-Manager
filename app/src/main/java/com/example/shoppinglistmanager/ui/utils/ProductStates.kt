@@ -21,7 +21,7 @@ class ProductStates(
 
     fun reset(product: Product) {
         name.value = product.name
-        price.value = product.price.toString()
+        price.value = product.price
         quantity.value = product.quantity.toString()
         purchased.value = product.purchased
     }
@@ -41,7 +41,7 @@ fun createProductStates(): ProductStates {
 fun createProductStates(product: Product): ProductStates {
     return ProductStates(
         name = remember { mutableStateOf(product.name) },
-        price = remember { mutableStateOf(product.price.toString()) },
+        price = remember { mutableStateOf(product.price) },
         quantity = remember { mutableStateOf(product.quantity.toString()) },
         purchased = remember { mutableStateOf(product.purchased) }
     )

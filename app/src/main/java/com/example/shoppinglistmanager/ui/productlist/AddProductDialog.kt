@@ -11,11 +11,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +42,9 @@ fun AddProductDialog(
 
     val context: Context = LocalContext.current
     val productStates: ProductStates = createProductStates()
+    val sharedState: MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
 
     AlertDialog(
         onDismissRequest = { openAddProductDialogState.value = false },
@@ -54,9 +61,15 @@ fun AddProductDialog(
 
                     if (productManager.isValidProduct(context)) {
                         val newProduct = productManager.createProduct()
-                        productViewModel.insertProduct(newProduct)
+
+                        if (!sharedState.value) {
+                            productViewModel.insertProduct(newProduct)
+                        } else {
+                            productViewModel.insertSharedProduct(newProduct)
+                        }
 
                         productStates.reset()
+                        sharedState.value = false
 
                         openAddProductDialogState.value = false
                     }
@@ -83,6 +96,7 @@ fun AddProductDialog(
                     NumberTextField(quantity, "Quantity")
                     PurchasedCheckbox(purchased)
                 }
+                SharedSwitch(sharedState)
             }
         }
     )
@@ -137,6 +151,28 @@ private fun PurchasedCheckbox(purchasedState: MutableState<Boolean>) {
                 purchasedState.value = it
             },
             colors = CheckboxDefaults.colors(MaterialTheme.colorScheme.secondary)
+        )
+    }
+}
+
+@Composable
+private fun SharedSwitch(sharedState: MutableState<Boolean>) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("Shared: ")
+        Switch(
+            checked = sharedState.value,
+            onCheckedChange = {
+                sharedState.value = it
+            },
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                checkedBorderColor = MaterialTheme.colorScheme.secondary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                uncheckedBorderColor = MaterialTheme.colorScheme.secondary
+            )
         )
     }
 }

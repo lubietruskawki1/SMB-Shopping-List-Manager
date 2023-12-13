@@ -15,42 +15,66 @@ class ProductRepository(
 ) {
 
     val allProductsMutable = MutableStateFlow(HashMap<String, Product>())
+    val allSharedProductsMutable = MutableStateFlow(HashMap<String, Product>())
+
     private val path: String = "users/${firebaseUser.uid}/products"
+    private val sharedPath: String = "shared/products"
 
     init {
-        firebaseDatabase.getReference(path).addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val product: Product = createProductFromSnapshot(snapshot)
-                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
-                    put(product.id, product)
-                } as HashMap<String, Product>
-            }
+        setupChildEventListener(path, allProductsMutable)
+        setupChildEventListener(sharedPath, allSharedProductsMutable)
+    }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val product: Product = createProductFromSnapshot(snapshot)
-                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
-                    put(product.id, product)
-                } as HashMap<String, Product>
-            }
+    private fun setupChildEventListener(
+        path: String,
+        mutableStateFlow: MutableStateFlow<HashMap<String, Product>>
+    ) {
+        firebaseDatabase.getReference(path)
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot,
+                                          previousChildName: String?) {
+                    val product: Product = createProductFromSnapshot(snapshot)
+                    mutableStateFlow.value = mutableStateFlow.value
+                        .toMutableMap()
+                        .apply {
+                            put(product.id, product)
+                        } as HashMap<String, Product>
+                }
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                val product: Product = createProductFromSnapshot(snapshot)
-                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
-                    remove(product.id, product)
-                } as HashMap<String, Product>
-            }
+                override fun onChildChanged(snapshot: DataSnapshot,
+                                            previousChildName: String?) {
+                    val product: Product = createProductFromSnapshot(snapshot)
+                    mutableStateFlow.value = mutableStateFlow.value
+                        .toMutableMap()
+                        .apply {
+                            put(product.id, product)
+                        } as HashMap<String, Product>
+                }
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                val product: Product = createProductFromSnapshot(snapshot)
-                allProductsMutable.value = allProductsMutable.value.toMutableMap().apply {
-                    remove(product.id, product)
-                    put(product.id, product)
-                } as HashMap<String, Product>
-            }
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    val product: Product = createProductFromSnapshot(snapshot)
+                    mutableStateFlow.value = mutableStateFlow.value
+                        .toMutableMap()
+                        .apply {
+                            remove(product.id, product)
+                        } as HashMap<String, Product>
+                }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("ProductRepository", "Database operation cancelled: ${error.message}")
-            }
+                override fun onChildMoved(snapshot: DataSnapshot,
+                                          previousChildName: String?) {
+                    val product: Product = createProductFromSnapshot(snapshot)
+                    mutableStateFlow.value = mutableStateFlow.value
+                        .toMutableMap()
+                        .apply {
+                            remove(product.id, product)
+                            put(product.id, product)
+                        } as HashMap<String, Product>
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("ProductRepository",
+                          "Database operation cancelled: ${error.message}")
+                }
         })
     }
 
@@ -64,7 +88,7 @@ class ProductRepository(
         )
     }
 
-    fun insert(product: Product): String {
+    private fun insert(path: String, product: Product): String {
         firebaseDatabase.getReference(path).push().also {
             product.id = it.ref.key!!
             it.setValue(product)
@@ -72,7 +96,15 @@ class ProductRepository(
         }
     }
 
-    fun update(product: Product) {
+    fun insert(product: Product): String {
+        return insert(path, product)
+    }
+
+    fun insertShared(product: Product): String {
+        return insert(sharedPath, product)
+    }
+
+    private fun update(path: String, product: Product) {
         val ref = firebaseDatabase.getReference("$path/${product.id}")
         ref.child("name").setValue(product.name)
         ref.child("price").setValue(product.price)
@@ -80,8 +112,24 @@ class ProductRepository(
         ref.child("purchased").setValue(product.purchased)
     }
 
-    fun delete(product: Product) {
+    fun update(product: Product) {
+        update(path, product)
+    }
+
+    fun updateShared(product: Product) {
+        update(sharedPath, product)
+    }
+
+    private fun delete(path: String, product: Product) {
         firebaseDatabase.getReference("$path/${product.id}").removeValue()
+    }
+
+    fun delete(product: Product) {
+        delete(path, product)
+    }
+
+    fun deleteShared(product: Product) {
+        delete(sharedPath, product)
     }
 
 }
