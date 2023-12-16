@@ -43,7 +43,7 @@ class ProductContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
         firebaseDatabase = FirebaseDatabase.getInstance()
-        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+        firebaseUser = FirebaseAuth.getInstance().currentUser ?: return false
         path = "users/${firebaseUser.uid}/products"
         return true
     }
@@ -53,6 +53,9 @@ class ProductContentProvider : ContentProvider() {
         selectionArgs: Array<String>?, sortOrder: String?
     ): Cursor? {
         val context = context ?: return null
+        if (!this::firebaseUser.isInitialized) {
+            return null
+        }
         val cursor = MatrixCursor(arrayOf(
             "id", "name", "price", "quantity", "purchased"
         ))
@@ -103,6 +106,9 @@ class ProductContentProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         val context: Context = context ?: return null
+        if (!this::firebaseUser.isInitialized) {
+            return null
+        }
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCTS -> {
                 val product: Product = createProductFromContentValues(values!!)
@@ -126,6 +132,9 @@ class ProductContentProvider : ContentProvider() {
         selectionArgs: Array<String>?
     ): Int {
         val context: Context = context ?: return 0
+        if (!this::firebaseUser.isInitialized) {
+            return 0
+        }
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCT -> {
                 val product: Product = createProductFromContentValues(values!!)
@@ -144,6 +153,9 @@ class ProductContentProvider : ContentProvider() {
         selectionArgs: Array<out String>?
     ): Int {
         val context: Context = context ?: return 0
+        if (!this::firebaseUser.isInitialized) {
+            return 0
+        }
         return when (uriMatcher.match(uri)) {
             URI_CODE_PRODUCT -> {
                 val id: String = uri.lastPathSegment ?: return 0
