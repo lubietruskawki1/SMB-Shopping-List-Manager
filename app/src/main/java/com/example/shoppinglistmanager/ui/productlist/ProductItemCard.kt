@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -20,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -31,16 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.shoppinglistmanager.data.entity.Product
-import com.example.shoppinglistmanager.ui.utils.ProductManager
-import com.example.shoppinglistmanager.ui.utils.ProductStates
-import com.example.shoppinglistmanager.ui.utils.createProductStates
+import com.example.shoppinglistmanager.ui.common.EditNumberTextField
+import com.example.shoppinglistmanager.ui.common.EditTitleStringTextField
+import com.example.shoppinglistmanager.ui.utils.product.ProductManager
+import com.example.shoppinglistmanager.ui.utils.product.ProductStates
+import com.example.shoppinglistmanager.ui.utils.product.createProductStates
 import com.example.shoppinglistmanager.ui.viewmodel.ProductViewModel
 import java.math.BigDecimal
 
@@ -118,7 +115,7 @@ fun ProductItemCard(
                 if (!editProductEnabledState.value) {
                     Text(
                         text = product.name,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Bold
                     )
                     val totalPrice: BigDecimal =
                         BigDecimal(product.price) * BigDecimal(product.quantity)
@@ -131,13 +128,13 @@ fun ProductItemCard(
                         fontSize = priceAndQuantityFontSize
                     )
                 } else {
-                    NameTextField(productStates.name)
-                    NumberTextField(
+                    EditTitleStringTextField(productStates.name)
+                    EditNumberTextField(
                         state = productStates.price,
                         fieldName = "Price per unit",
                         fontSize = priceAndQuantityFontSize
                     )
-                    NumberTextField(
+                    EditNumberTextField(
                         state = productStates.quantity,
                         fieldName = "Quantity",
                         fontSize = priceAndQuantityFontSize
@@ -190,46 +187,5 @@ fun ProductItemCard(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun NameTextField(nameState: MutableState<String>) {
-    TextField(
-        value = nameState.value,
-        textStyle = TextStyle(
-            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-            fontWeight = FontWeight.Bold
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        onValueChange = {
-            nameState.value = it
-        }
-    )
-}
-
-@Composable
-private fun NumberTextField(
-    state: MutableState<String>,
-    fieldName: String,
-    fontSize: TextUnit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "$fieldName: ",
-            fontSize = fontSize
-        )
-        TextField(
-            value = state.value,
-            textStyle = TextStyle(fontSize = fontSize),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            onValueChange = {
-                state.value = it
-            }
-        )
     }
 }

@@ -4,4 +4,5 @@
     <string name="title_activity_options">OptionsActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegistrationActivity</string>
+    <string name="title_activity_store_list">StoreListActivity</string>
 </resources>

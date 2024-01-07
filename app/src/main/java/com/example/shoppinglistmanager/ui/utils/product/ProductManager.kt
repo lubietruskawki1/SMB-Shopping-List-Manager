@@ -1,7 +1,8 @@
-package com.example.shoppinglistmanager.ui.utils
+package com.example.shoppinglistmanager.ui.utils.product
 
 import android.content.Context
 import com.example.shoppinglistmanager.data.entity.Product
+import com.example.shoppinglistmanager.ui.utils.showToast
 import java.math.BigDecimal
 
 private const val DUMMY_ID = "DUMMY_ID"

@@ -1,5 +1,6 @@
 package com.example.shoppinglistmanager.ui.authentication
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -34,12 +35,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import com.example.shoppinglistmanager.R
 import com.example.shoppinglistmanager.ui.common.TopAppBarAuthentication
 import com.example.shoppinglistmanager.ui.main.MainActivity
 import com.example.shoppinglistmanager.ui.theme.ShoppingListManagerTheme
+import com.example.shoppinglistmanager.ui.utils.checkLocationPermission
 import com.example.shoppinglistmanager.ui.viewmodel.AuthenticationViewModel
 import com.example.shoppinglistmanager.ui.viewmodel.OptionsViewModel
+
+private const val ACCESS_LOCATION_REQUEST_CODE = 101
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +60,21 @@ class LoginActivity : ComponentActivity() {
                     LoginScreen(authenticationViewModel)
                 }
             }
+            setupNotificationsPermission()
+        }
+    }
+
+    private fun setupNotificationsPermission() {
+        if (!checkLocationPermission(this)) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ),
+                ACCESS_LOCATION_REQUEST_CODE
+            )
         }
     }
 }

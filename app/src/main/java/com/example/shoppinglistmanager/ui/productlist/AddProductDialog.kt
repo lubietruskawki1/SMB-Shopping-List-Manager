@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -15,20 +14,19 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.shoppinglistmanager.ui.utils.ProductManager
-import com.example.shoppinglistmanager.ui.utils.ProductStates
-import com.example.shoppinglistmanager.ui.utils.createProductStates
+import com.example.shoppinglistmanager.data.entity.Product
+import com.example.shoppinglistmanager.ui.common.NumberTextField
+import com.example.shoppinglistmanager.ui.common.StringTextField
+import com.example.shoppinglistmanager.ui.utils.product.ProductManager
+import com.example.shoppinglistmanager.ui.utils.product.ProductStates
+import com.example.shoppinglistmanager.ui.utils.product.createProductStates
 import com.example.shoppinglistmanager.ui.viewmodel.ProductViewModel
 
 @Composable
@@ -60,7 +58,7 @@ fun AddProductDialog(
                     val productManager = ProductManager(productStates)
 
                     if (productManager.isValidProduct(context)) {
-                        val newProduct = productManager.createProduct()
+                        val newProduct: Product = productManager.createProduct()
 
                         if (!sharedState.value) {
                             productViewModel.insertProduct(newProduct)
@@ -91,50 +89,13 @@ fun AddProductDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 with (productStates) {
-                    NameTextField(name)
+                    StringTextField(name, "Name")
                     NumberTextField(price, "Price per unit")
                     NumberTextField(quantity, "Quantity")
                     PurchasedCheckbox(purchased)
                 }
                 SharedSwitch(sharedState)
             }
-        }
-    )
-}
-
-@Composable
-private fun NameTextField(nameState: MutableState<String>) {
-    TextField(
-        value = nameState.value,
-        onValueChange = {
-            nameState.value = it
-        },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        label = {
-            Text(
-                text = "Name",
-                color = Color.Gray
-            )
-        }
-    )
-}
-
-@Composable
-private fun NumberTextField(
-    state: MutableState<String>,
-    labelText: String
-) {
-    TextField(
-        value = state.value,
-        onValueChange = {
-            state.value = it
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = {
-            Text(
-                text = labelText,
-                color = Color.Gray
-            )
         }
     )
 }

@@ -23,6 +23,7 @@ import com.example.shoppinglistmanager.R
 import com.example.shoppinglistmanager.ui.common.TopAppBar
 import com.example.shoppinglistmanager.ui.options.OptionsActivity
 import com.example.shoppinglistmanager.ui.productlist.ProductListActivity
+import com.example.shoppinglistmanager.ui.storelist.StoreListActivity
 import com.example.shoppinglistmanager.ui.theme.ShoppingListManagerTheme
 import com.example.shoppinglistmanager.ui.viewmodel.OptionsViewModel
 
@@ -54,6 +55,13 @@ private fun HomeScreen() {
             icon = painterResource(R.drawable.shopping_list)
         ),
         HomeItem(
+            name = "Stores",
+            intent = { context ->
+                Intent(context, StoreListActivity::class.java)
+            },
+            icon = painterResource(R.drawable.store)
+        ),
+        HomeItem(
             name = "Options",
             intent = { context ->
                 Intent(context, OptionsActivity::class.java)
@@ -81,7 +89,8 @@ private fun HomeList(homeItems: List<HomeItem>) {
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         items(homeItems) { menuItem ->
             MenuItemCard(menuItem)

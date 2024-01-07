@@ -1,4 +1,4 @@
-package com.example.shoppinglistmanager.ui.utils
+package com.example.shoppinglistmanager.ui.utils.product
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
