@@ -2,7 +2,6 @@ package com.example.shoppinglistmanager.ui.storelist
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,10 @@ import androidx.compose.ui.unit.dp
 import com.example.shoppinglistmanager.data.entity.Store
 import com.example.shoppinglistmanager.ui.common.NumberTextField
 import com.example.shoppinglistmanager.ui.common.StringTextField
+import com.example.shoppinglistmanager.ui.utils.showToast
 import com.example.shoppinglistmanager.ui.utils.store.StoreManager
 import com.example.shoppinglistmanager.ui.utils.store.StoreStates
 import com.example.shoppinglistmanager.ui.utils.store.createStoreStates
-import com.example.shoppinglistmanager.ui.utils.showToast
 import com.example.shoppinglistmanager.ui.viewmodel.StoreViewModel
 import com.google.android.gms.location.LocationServices
 
@@ -51,8 +50,7 @@ fun AddStoreDialog(
                 onClick = {
                     LocationServices.getFusedLocationProviderClient(context)
                         .lastLocation
-                            .addOnSuccessListener {
-                                val location: Location = it
+                            .addOnSuccessListener { location ->
                                 val storeManager = StoreManager(storeStates)
 
                                 if (storeManager.isValidStore(context)) {
@@ -64,9 +62,9 @@ fun AddStoreDialog(
                                     openAddStoreDialogState.value = false
                                 }
                             }
-                            .addOnFailureListener {
+                            .addOnFailureListener { exception ->
                                 // showToast(context, "No location information available.")
-                                showToast(context,  it.message.toString())
+                                showToast(context, exception.message.toString())
                             }
                 }
             ) {

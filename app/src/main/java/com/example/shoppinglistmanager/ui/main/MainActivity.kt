@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.shoppinglistmanager.R
 import com.example.shoppinglistmanager.ui.common.TopAppBar
+import com.example.shoppinglistmanager.ui.map.MapActivity
 import com.example.shoppinglistmanager.ui.options.OptionsActivity
 import com.example.shoppinglistmanager.ui.productlist.ProductListActivity
 import com.example.shoppinglistmanager.ui.storelist.StoreListActivity
@@ -53,6 +54,13 @@ private fun HomeScreen() {
                 Intent(context, ProductListActivity::class.java)
             },
             icon = painterResource(R.drawable.shopping_list)
+        ),
+        HomeItem(
+            name = "Map",
+            intent = { context ->
+                Intent(context, MapActivity::class.java)
+            },
+            icon = painterResource(R.drawable.map)
         ),
         HomeItem(
             name = "Stores",
