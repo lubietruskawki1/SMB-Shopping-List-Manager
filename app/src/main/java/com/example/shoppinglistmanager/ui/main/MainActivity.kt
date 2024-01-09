@@ -1,9 +1,15 @@
 package com.example.shoppinglistmanager.ui.main
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,16 +25,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.shoppinglistmanager.R
+import com.example.shoppinglistmanager.receiver.GeofenceReceiver
 import com.example.shoppinglistmanager.ui.common.TopAppBar
 import com.example.shoppinglistmanager.ui.map.MapActivity
 import com.example.shoppinglistmanager.ui.options.OptionsActivity
 import com.example.shoppinglistmanager.ui.productlist.ProductListActivity
 import com.example.shoppinglistmanager.ui.storelist.StoreListActivity
 import com.example.shoppinglistmanager.ui.theme.ShoppingListManagerTheme
+import com.example.shoppinglistmanager.ui.utils.checkBackgroundLocationPermission
 import com.example.shoppinglistmanager.ui.viewmodel.OptionsViewModel
 
+private const val ACCESS_BACKGROUND_LOCATION_REQUEST_CODE = 111
+
 class MainActivity : ComponentActivity() {
+
+    private lateinit var receiver: GeofenceReceiver
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -42,6 +58,41 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        setupBackgroundLocationPermission()
+        createChannel()
+        receiver = GeofenceReceiver()
+    }
+
+    private fun setupBackgroundLocationPermission() {
+        if (!checkBackgroundLocationPermission(this)) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                ACCESS_BACKGROUND_LOCATION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun createChannel() {
+        val channel = NotificationChannel(
+            getString(R.string.geofence_channel),
+            "Channel for geofence notifications",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        NotificationManagerCompat.from(applicationContext)
+            .createNotificationChannel(channel)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(receiver, IntentFilter(), RECEIVER_EXPORTED)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
     }
 }
 

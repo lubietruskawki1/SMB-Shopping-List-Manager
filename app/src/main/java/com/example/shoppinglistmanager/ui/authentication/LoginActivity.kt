@@ -3,9 +3,11 @@ package com.example.shoppinglistmanager.ui.authentication
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,13 +42,14 @@ import com.example.shoppinglistmanager.R
 import com.example.shoppinglistmanager.ui.common.TopAppBarAuthentication
 import com.example.shoppinglistmanager.ui.main.MainActivity
 import com.example.shoppinglistmanager.ui.theme.ShoppingListManagerTheme
-import com.example.shoppinglistmanager.ui.utils.checkLocationPermission
+import com.example.shoppinglistmanager.ui.utils.checkLocationAndNotificationsPermission
 import com.example.shoppinglistmanager.ui.viewmodel.AuthenticationViewModel
 import com.example.shoppinglistmanager.ui.viewmodel.OptionsViewModel
 
-private const val ACCESS_LOCATION_REQUEST_CODE = 101
+private const val ACCESS_LOCATION_AND_POST_NOTIFICATIONS_REQUEST_CODE = 101
 
 class LoginActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -60,20 +63,21 @@ class LoginActivity : ComponentActivity() {
                     LoginScreen(authenticationViewModel)
                 }
             }
-            setupNotificationsPermission()
         }
+        setupLocationAndNotificationsPermission()
     }
 
-    private fun setupNotificationsPermission() {
-        if (!checkLocationPermission(this)) {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun setupLocationAndNotificationsPermission() {
+        if (!checkLocationAndNotificationsPermission(this)) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    Manifest.permission.POST_NOTIFICATIONS
                 ),
-                ACCESS_LOCATION_REQUEST_CODE
+                ACCESS_LOCATION_AND_POST_NOTIFICATIONS_REQUEST_CODE
             )
         }
     }

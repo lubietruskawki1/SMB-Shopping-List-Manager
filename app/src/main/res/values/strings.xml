@@ -6,4 +6,5 @@
     <string name="title_activity_register">RegistrationActivity</string>
     <string name="title_activity_store_list">StoreListActivity</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="geofence_channel">geofenceChannel</string>
 </resources>

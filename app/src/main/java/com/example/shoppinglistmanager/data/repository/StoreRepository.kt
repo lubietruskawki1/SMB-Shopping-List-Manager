@@ -62,7 +62,7 @@ class StoreRepository(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("StoreRepository",
+                    Log.e("StoreRepositoryError",
                         "Database operation cancelled: ${error.message}")
                 }
             })
@@ -73,7 +73,7 @@ class StoreRepository(
             id = snapshot.ref.key as String,
             name = snapshot.child("name").value as String,
             description = snapshot.child("description").value as String,
-            radius = (snapshot.child("radius").value as Number).toDouble(),
+            radius = (snapshot.child("radius").value as Number).toFloat(),
             latitude = (snapshot.child("latitude").value as Number).toDouble(),
             longitude = (snapshot.child("longitude").value as Number).toDouble()
         )

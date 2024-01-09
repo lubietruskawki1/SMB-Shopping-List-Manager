@@ -19,8 +19,8 @@ class StoreManager(
         radius = storeStates.radius.value
     )
     
-    private fun isValidDouble(string: String): Boolean {
-        return string.toDoubleOrNull() != null
+    private fun isValidFloat(string: String): Boolean {
+        return string.toFloatOrNull() != null
     }
 
     private fun isValidName(context: Context): Boolean {
@@ -47,12 +47,12 @@ class StoreManager(
             return false
         }
 
-        if (!isValidDouble(radius)) {
-            showToast(context, "Price must be a valid number.")
+        if (!isValidFloat(radius)) {
+            showToast(context, "Radius must be a valid number.")
             return false
         }
 
-        if (radius.toDouble() <= 0) {
+        if (radius.toFloat() <= 0) {
             showToast(context, "Radius must be positive.")
             return false
         }
@@ -70,7 +70,7 @@ class StoreManager(
             id = DUMMY_ID,
             name = name.trim(),
             description = description.trim(),
-            radius = radius.toDouble(),
+            radius = radius.toFloat(),
             latitude = location.latitude,
             longitude = location.longitude
         )
@@ -79,7 +79,7 @@ class StoreManager(
     fun updateStore(store: Store) {
         store.name = name.trim()
         store.description = description
-        store.radius = radius.toDouble()
+        store.radius = radius.toFloat()
     }
 
 }

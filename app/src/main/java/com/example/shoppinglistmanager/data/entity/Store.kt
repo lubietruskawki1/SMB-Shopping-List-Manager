@@ -4,7 +4,7 @@ data class Store(
     var id: String,
     var name: String,
     var description: String,
-    var radius: Double,
+    var radius: Float,
     var latitude: Double,
     var longitude: Double
 )
