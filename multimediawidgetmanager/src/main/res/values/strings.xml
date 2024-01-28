@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">MultimediaWidgetManager</string>
     <string name="openbrowserbutton_text">Open Web Page</string>
+    <string name="imageview_text">Cute animal</string>
+    <string name="changeimagebutton_text">Change Image</string>
     <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
+    <string name="app_widget_description">This is a multimedia widget</string>
 </resources>
